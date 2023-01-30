@@ -33,7 +33,7 @@ class identify:
 
         self.path = GivenPath[0] 
 
-        GivenSource = GivenPath[1].split("=") # GivenPath[1] is split "source=severa" -> ["source", "severa"] or "source=netvisor&paymentnumber=102226" -> ["source", "netvisor&paymentnumber", "102226"]
+        GivenSource = GivenPath[1].split("=") # GivenPath[1] is split from "source=severa" -> ["source", "severa"] or "source=netvisor&paymentnumber=102226" -> ["source", "netvisor&paymentnumber", "102226"]
         
         if GivenSource[0] != expectedSource: #checks if Source is written correctly
             raise Exception("'" + GivenSource[0] + "' IS NOT CORRECT WRITTEN SOURCE, EXPECTED" + expectedSource +" PLEASE FIX IT.")
@@ -60,7 +60,7 @@ class identify:
             raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
 
         key = GivenSource[0] # key is assigned  as 'source'
-        SourceCompany = GivenSource[1]
+        SourceCompany = GivenSource[1] 
         try:
             self.parameter[key] = SourceCompany
         except UnboundLocalError:
@@ -93,10 +93,10 @@ class identify:
 
         self.parameter[key] = SourceCompany
 
-        key = ParameterConfirm[1] 
+        key = ParameterConfirm[1] # key is assigned  as 'paymentnumber'
 
         try:
-            paymentnumber = int(GivenSource[2]) #Checks that if parameter can be turned to INT, otherwise gives error
+            paymentnumber = int(GivenSource[2]) #Checks that if parameter paymentnumber can be turned to INT, otherwise gives error
         except ValueError:
             print("YOUR '" + GivenSource[2] + "' PARAMETER VALUE IS NOT CORRECT, IT SHOULD PRODUCE INT, PLEASE FIX IT")
             sys.exit()
@@ -113,7 +113,7 @@ class identify:
 
 
     def _sign(self,GivenSource,expectedDocumentStr):
-        ParameterSign = GivenSource[1].split("&")  # "vismasign&documentid" -> ["vismasign", "documentid"]
+        ParameterSign = GivenSource[1].split("&")  # parses expected from "vismasign&documentid" -> ["vismasign", "documentid"]
 
         list_length = len(GivenSource)
 
@@ -123,17 +123,18 @@ class identify:
         elif list_length > 3:
             raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")    
 
-        key = GivenSource[0]
+        key = GivenSource[0] # key is assigned  as 'source'
+        SourceCompany = ParameterSign[0]
 
-        self.parameter[key] = ParameterSign[0]
+        self.parameter[key] = SourceCompany 
 
         if ParameterSign[1] != expectedDocumentStr:
             raise Exception( "'"+ ParameterSign[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedDocumentStr + "', PLEASE FIX IT.")
 
-        key = ParameterSign[1]
-        
+        key = ParameterSign[1] # key is assigned as 'documentid'
+        documentID = GivenSource[2]
         try:
-            self.parameter[key] = GivenSource[2]
+            self.parameter[key] = documentID
         except UnboundLocalError:
             print("SOMETHING WENT CRITICALLY WRONG AT END,  '"+ GivenSource[2] + "', PLEASE CHECK THAT THE END OF URI IS CORRECT")
             sys.exit()
