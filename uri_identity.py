@@ -4,9 +4,10 @@ class identify:
         self.uri = uri
         self.path = None
         self.parameter = {}
+        self.parse()
 
     
-    def parse(self): #Paths: login, confirm, sign
+    def parse(self): 
         expectedScheme = "visma-identity"
         expectedPath= ("login", "confirm", "sign")
         expectedPayment = "paymentnumber"
@@ -15,23 +16,27 @@ class identify:
 
 
         uriParsed = self.uri
-        #should check that it correctly parses or if it gives error
-        GivenScheme = uriParsed.split("://") # GivenScheme is should look like visma-identity://login?source=severa -> ["visma-identity", "login?source=severa"]
+        if isinstance(uriParsed, int) == True:
+            raise Exception("URI NEEDS TO BE STRING, NOT INT. PLEASE FIX IT.")
+
+
+        GivenScheme = uriParsed.split("://") # GivenScheme is should parsing like visma-identity://login?source=severa -> ["visma-identity", "login?source=severa"]
+
+
+        if GivenScheme[0] != expectedScheme: #tests if the start of given uri is actually "visma-identity"
+            raise Exception("'"+ GivenScheme[0] + "' IS NOT CORRECT SCHEME, EXPECTED '"+ expectedScheme + "', PLEASE FIX IT.")
         
         GivenPath = GivenScheme[1].split("?") # GivenPath goes from "login?source=severa" to ["login", "source=severa"]
 
-        if GivenScheme[0] != expectedScheme: #tests if the start of given uri is actually "visma-identity"
-            exit
+        if GivenPath[0].endswith(expectedPath) == False: #Tests that if GivenPath is either "login", "confirm", or "sign"
+            raise Exception( "'"+ GivenPath[0] + "' IS NOT CORRECT A PATH, EXPECTED 'login', 'confirm', OR 'sign', PLEASE FIX IT.")
 
-        if GivenPath[0].endswith(expectedPath) == False: #Tests that if expectedPath is either "login", "confirm", or "sign"
-            exit
-
-        self.path = GivenPath[0] #Is this truly in the right spot?
+        self.path = GivenPath[0] 
 
         GivenSource = GivenPath[1].split("=") # "source=severa" -> ["source", "severa"] or "source=netvisor&paymentnumber=102226" -> ["source", "netvisor&paymentnumber", "102226"]
         
-        if GivenSource[0] != expectedSource: #check if it is source
-            exit
+        if GivenSource[0] != expectedSource: #check if Source is written correctly
+            raise Exception("'" + GivenSource[0] + "' IS NOT CORRECT WRITTEN SOURCE, EXPECTED" + expectedSource +" PLEASE FIX IT.")
 
 
 
@@ -46,7 +51,7 @@ class identify:
             ParameterConfirm = GivenSource[1].split("&") # "netvisor&paymentnumber" -> ["netvisor", "paymentnumber"]
 
             if ParameterConfirm[1] != expectedPayment:
-                exit
+                raise Exception( "'"+ ParameterConfirm[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedPayment + "', PLEASE FIX IT.")
 
             key = GivenSource[0]
 
@@ -68,17 +73,27 @@ class identify:
             self.parameter[key] = ParameterSign[0]
 
             if ParameterSign[1] != expectedDocumentStr:
-                exit
+                raise Exception( "'"+ ParameterSign[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedDocumentStr + "', PLEASE FIX IT.")
 
             key = ParameterSign[1]
 
             self.parameter[key] = key = GivenSource[2]
             #expects string id
 
+    
+class TestClass():
+    def __init__(self,uri):
+        self.id = identify(uri)
+    
+    def get_path(self):
+        return self.id.path
+
+    def get_parameter(self):
+        return self.id.parameter.values() #Correct with the values?
         
-        return print() #path and parameter as key valye pairs
+p1 = TestClass("visma-identity://sonfirm?source=netvisor&paymentnumber=102226")
 
 
-p1 = identify("visma-identity://confirm?source=netvisor&paymentnumber=102226")
-
-p1.parse() # remember to add try catch
+print("Path: " + p1.get_path())
+print("Parameters: ", end="")
+print(p1.get_parameter())
