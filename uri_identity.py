@@ -59,6 +59,8 @@ class identify:
                 sys.exit()
 
 
+
+
         elif GivenPath[0] == "confirm": 
             list_length = len(GivenSource)
             #Checks that if the end number string is missing or there are too many strings at the end
@@ -133,7 +135,8 @@ class TestClass():
     def get_parameter(self):
         return self.id.parameter.values()
      
-p1 = TestClass("visma-identity://confirm?source=netvisor&paymentnumber=102020//ss")
+
+p1 = TestClass("visma-identity://confirm?source=netvisor&paymentnumber=102020")
 
 
 print("Path: " + p1.get_path())
