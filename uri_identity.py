@@ -43,9 +43,10 @@ class identify:
 
         if GivenPath[0] == "login":
             list_length = len(GivenSource)
+
             #Checks that if the end number string is missing or there are too many strings at the end
             if list_length < 2: 
-                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE FIX IT.")
+                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI")
             elif list_length > 2:
                 raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
 
@@ -62,7 +63,7 @@ class identify:
             list_length = len(GivenSource)
             #Checks that if the end number string is missing or there are too many strings at the end
             if list_length < 3: 
-                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE FIX IT.")
+                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI.")
             elif list_length > 3:
                 raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
                 
