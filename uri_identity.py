@@ -37,91 +37,107 @@ class identify:
         
         if GivenSource[0] != expectedSource: #checks if Source is written correctly
             raise Exception("'" + GivenSource[0] + "' IS NOT CORRECT WRITTEN SOURCE, EXPECTED" + expectedSource +" PLEASE FIX IT.")
+
         
-
-
-
         if GivenPath[0] == "login":
-            list_length = len(GivenSource)
-
-            #Checks that if the end number string is missing or there are too many strings at the end
-            if list_length < 2: 
-                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI")
-            elif list_length > 2:
-                raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
-
-            key = GivenSource[0] #Just 'source' key
-            SourceCompany = GivenSource[1]
-            try:
-                self.parameter[key] = SourceCompany
-            except UnboundLocalError:
-                print("SOMETHING WENT CRITICALLY WRONG AT END, PLEASE CHECK THAT THE END OF URI IS CORRECT")
-                sys.exit()
-
-
-
+            self._login(GivenSource)
 
         elif GivenPath[0] == "confirm": 
-            list_length = len(GivenSource)
-            #Checks that if the end number string is missing or there are too many strings at the end
-            if list_length < 3: 
-                raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI.")
-            elif list_length > 3:
-                raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
-                
-
-
-            ParameterConfirm = GivenSource[1].split("&") #Parses "netvisor&paymentnumber" -> ["netvisor", "paymentnumber"]
-
-            if ParameterConfirm[1] != expectedPayment:
-                raise Exception( "'"+ ParameterConfirm[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedPayment + "', PLEASE FIX IT.")
-
-
-            key = GivenSource[0] #Just 'source' key
-
-            SourceCompany = ParameterConfirm[0]
-
-            self.parameter[key] = SourceCompany
-
-            key = ParameterConfirm[1] #Just 'paymentnumber'
-
-            try:
-                paymentnumber = int(GivenSource[2]) #Check that it actually turn to int
-            except ValueError:
-                print("YOUR '" + GivenSource[2] + "' PARAMETER VALUE IS NOT CORRECT, IT SHOULD PRODUCE INT, PLEASE FIX IT")
-                sys.exit()
-
-            try:
-                self.parameter[key] = paymentnumber #this expects to have a second, whaty if it dosent
-            except UnboundLocalError:
-                print("SOMETHING WENT CRITICALLY WRONG AT END, '"+ paymentnumber + "', PLEASE CHECK THAT THE END OF URI IS CORRECT")
-                sys.exit()
-            
-
-
-        
+            self._confirm(GivenSource,expectedPayment)
+                    
         elif GivenPath[0] == "sign": 
-            ParameterSign = GivenSource[1].split("&")  # "vismasign&documentid" -> ["vismasign", "documentid"]
+            self._sign(GivenSource,expectedDocumentStr)
+        return None
+    
+        
+    def _login(self,GivenSource):
+        list_length = len(GivenSource)
 
-            list_length = len(GivenSource)
+        # Checks that if the end parameter has from uri string is missing or there are too many parameters at the end of uri
+        if list_length < 2: 
+            raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI")
+        elif list_length > 2:
+            raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
 
-            if list_length < 2 or list_length > 2:
-                raise Exception( "'"+ ParameterConfirm[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedPayment + "', PLEASE FIX IT.")
+        key = GivenSource[0] # key is assigned  as 'source'
+        SourceCompany = GivenSource[1]
+        try:
+            self.parameter[key] = SourceCompany
+        except UnboundLocalError:
+            print("SOMETHING WENT CRITICALLY WRONG AT END, PLEASE CHECK THAT THE END OF URI IS CORRECT")
+            sys.exit()
+        return None
+        
 
-            key = GivenSource[0]
 
-            self.parameter[key] = ParameterSign[0]
+    def _confirm(self,GivenSource, expectedPayment):
+        list_length = len(GivenSource)
 
-            if ParameterSign[1] != expectedDocumentStr:
-                raise Exception( "'"+ ParameterSign[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedDocumentStr + "', PLEASE FIX IT.")
-
-            key = ParameterSign[1]
+        # Checks that if the end number from uri string is missing or  there are too many parameters at the end of uri
+        if list_length < 3: 
+            raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI.")
+        elif list_length > 3:
+            raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")
             
-            try:
-                self.parameter[key] = GivenSource[2]
-            except UnboundLocalError:
-                print("SOMETHING WENT CRITICALLY WRONG AT END,  '"+ GivenSource[2] + "', PLEASE CHECK THAT THE END OF URI IS CORRECT")
-                sys.exit()
+
+
+        ParameterConfirm = GivenSource[1].split("&") #Parses "netvisor&paymentnumber" -> ["netvisor", "paymentnumber"]
+
+        if ParameterConfirm[1] != expectedPayment:
+            raise Exception( "'"+ ParameterConfirm[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedPayment + "', PLEASE FIX IT.")
+
+
+        key = GivenSource[0] # key is assigned  as 'source'
+
+        SourceCompany = ParameterConfirm[0] 
+
+        self.parameter[key] = SourceCompany
+
+        key = ParameterConfirm[1] 
+
+        try:
+            paymentnumber = int(GivenSource[2]) #Checks that if parameter can be turned to INT, otherwise gives error
+        except ValueError:
+            print("YOUR '" + GivenSource[2] + "' PARAMETER VALUE IS NOT CORRECT, IT SHOULD PRODUCE INT, PLEASE FIX IT")
+            sys.exit()
+
+        try:
+            self.parameter[key] = paymentnumber
+        except UnboundLocalError:
+            print("SOMETHING WENT CRITICALLY WRONG AT END, '"+ paymentnumber + "', PLEASE CHECK THAT THE END OF URI IS CORRECT")
+            sys.exit()
+
+        return None
+
+
+
+
+    def _sign(self,GivenSource,expectedDocumentStr):
+        ParameterSign = GivenSource[1].split("&")  # "vismasign&documentid" -> ["vismasign", "documentid"]
+
+        list_length = len(GivenSource)
+
+        # Checks that if the end number from uri string is missing or there are too many parameters at the end of uri
+        if list_length < 3: 
+            raise Exception( "THERE ARE TOO LITTLE PARAMETERS, PLEASE CHECK THE URI.")
+        elif list_length > 3:
+            raise Exception( "THERE ARE TOO MANY PARAMETERS, PLEASE CHECK THE URI.")    
+
+        key = GivenSource[0]
+
+        self.parameter[key] = ParameterSign[0]
+
+        if ParameterSign[1] != expectedDocumentStr:
+            raise Exception( "'"+ ParameterSign[1] + "' IS NOT CORRECT, EXPECTED '"+ expectedDocumentStr + "', PLEASE FIX IT.")
+
+        key = ParameterSign[1]
+        
+        try:
+            self.parameter[key] = GivenSource[2]
+        except UnboundLocalError:
+            print("SOMETHING WENT CRITICALLY WRONG AT END,  '"+ GivenSource[2] + "', PLEASE CHECK THAT THE END OF URI IS CORRECT")
+            sys.exit()
+        return None
 
 
     
@@ -136,7 +152,7 @@ class TestClass():
         return self.id.parameter.values()
      
 
-p1 = TestClass("visma-identity://confirm?source=netvisor&paymentnumber=102020")
+p1 = TestClass("visma-identity://sign?source=vismasign&documentid=105ab44")
 
 
 print("Path: " + p1.get_path())
